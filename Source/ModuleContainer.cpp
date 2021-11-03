@@ -307,6 +307,8 @@ void ModuleContainer::TakeModule(IDrawableModule* module)
    if (module->GetOwningContainer()->mOwner)
       module->GetOwningContainer()->mOwner->RemoveChild(module);
    RemoveFromVector(module, module->GetOwningContainer()->mModules);
+
+   std::string newName = GetUniqueName(module->Name(), mModules);
    
    mModules.push_back(module);
    MoveToFront(module);
@@ -316,13 +318,9 @@ void ModuleContainer::TakeModule(IDrawableModule* module)
                        module->GetPosition(true).y + offset.y);
    module->SetOwningContainer(this);
    if (mOwner)
-   {
       mOwner->AddChild(module);
-   }
    else   //root modulecontainer
-   {
-      module->SetName(GetUniqueName(module->Name(), mModules).c_str());
-   }
+      module->SetName(newName.c_str());
 }
 
 void ModuleContainer::DeleteModule(IDrawableModule* module)
@@ -336,6 +334,9 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
       RemoveFromVector(module, mModules, K(fail));
       return;
    }
+
+   if (module->GetParent())
+      module->GetParent()->GetModuleParent()->RemoveChild(module);
    
    RemoveFromVector(module, mModules, K(fail));
    for (auto iter : mModules)
@@ -349,7 +350,7 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
                cablesToDestroy.push_back(cable);
          }
          for (auto cable : cablesToDestroy)
-            cable->Destroy();
+            cable->Destroy(false);
       }
    }
 
@@ -572,7 +573,7 @@ ofxJSONElement ModuleContainer::WriteModules()
 
 namespace
 {
-   const int kSaveStateRev = 421;
+   const int kSaveStateRev = 422;
 }
 
 void ModuleContainer::SaveState(FileStreamOut& out)

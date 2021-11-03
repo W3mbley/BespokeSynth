@@ -208,7 +208,9 @@ target_sources(BespokeSynth PRIVATE
     NoteStreamDisplay.cpp
     NoteStrummer.cpp
     NoteSustain.cpp
+    NoteTable.cpp
     NoteToFreq.cpp
+    NoteToggle.cpp
     NoteToMs.cpp
     NoteToPulse.cpp
     NoteTransformer.cpp

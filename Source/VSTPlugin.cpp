@@ -79,7 +79,7 @@ namespace VSTLookup
       for (int i=0; i<types.size(); ++i)
          vsts.push_back(types[i].fileOrIdentifier.toStdString());
 
-      //for (int i = 0; i < 40; ++i)
+      //for (int i = 0; i < 2000; ++i)
       //   vsts.insert(vsts.begin(), std::string("c:/a+") + ofToString(gRandom()));
 
       SortByLastUsed(vsts);
@@ -130,8 +130,15 @@ namespace VSTLookup
 
          for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
          {
-            std::string key = it.key().asString();
-            lastUsedTimes[key] = jsonList[key].asDouble();
+            try
+            {
+               std::string key = it.key().asString();
+               lastUsedTimes[key] = jsonList[key].asDouble();
+            }
+            catch (Json::LogicError& e)
+            {
+               TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+            }
          }
       }
 
